@@ -27,25 +27,4 @@ class HomeController extends AbstractController
             'path' => 'src/Controller/HomeController.php',
         ]);
     }
-
-    #[Route('/test', name: 'app_test')]
-    public function testAPI() : JsonResponse {
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.boardgameatlas.com/api/search?limit=3&order_by=rank&ascending=false&pretty=true&client_id=86dlh7CuWH',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-        return $this->json($response);
-    }
 }
