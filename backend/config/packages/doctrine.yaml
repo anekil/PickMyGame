@@ -1,6 +1,5 @@
 doctrine:
     dbal:
-        driver: postgresql
         url: '%env(resolve:DATABASE_URL)%'
         user: 'postgres'
         profiling_collect_backtrace: '%kernel.debug%'
