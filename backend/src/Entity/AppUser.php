@@ -3,15 +3,25 @@
 namespace App\Entity;
 
 use App\Repository\AppUserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Metadata\ApiResource;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AppUserRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: [
+        'groups' => ['user:read'],
+    ],
+    denormalizationContext: [
+        'groups' => ['user:write'],
+    ]
+)]
 #[UniqueEntity(fields: ['username'], message: 'This username is taken.')]
 class AppUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -22,6 +32,7 @@ class AppUser implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
+    #[Groups(['user:write', 'user:read', 'game:read', 'game:item:get'])]
     private ?string $username = null;
 
     #[ORM\Column]
@@ -31,7 +42,17 @@ class AppUser implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['user:write'])]
     private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: UsersGame::class, orphanRemoval: true)]
+    #[Groups(['user:read'])]
+    private Collection $usersGames;
+
+    public function __construct()
+    {
+        $this->usersGames = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -101,5 +122,35 @@ class AppUser implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, UsersGame>
+     */
+    public function getUsersGames(): Collection
+    {
+        return $this->usersGames;
+    }
+
+    public function addUsersGame(UsersGame $usersGame): static
+    {
+        if (!$this->usersGames->contains($usersGame)) {
+            $this->usersGames->add($usersGame);
+            $usersGame->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUsersGame(UsersGame $usersGame): static
+    {
+        if ($this->usersGames->removeElement($usersGame)) {
+            // set the owning side to null (unless already changed)
+            if ($usersGame->getOwner() === $this) {
+                $usersGame->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }
