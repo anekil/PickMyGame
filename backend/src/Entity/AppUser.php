@@ -42,6 +42,7 @@ class AppUser implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank]
     #[Groups(['user:write'])]
     private ?string $password = null;
 

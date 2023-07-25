@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\Metadata\Get;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UsersGameRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UsersGameRepository::class)]
@@ -37,12 +38,7 @@ class UsersGame
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['game:read'])]
     private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['game:write', 'game:read', 'user:read'])]
-    private ?string $id_game = null;
 
     #[ORM\Column]
     #[Groups(['game:write', 'game:read', 'user:read'])]
@@ -53,21 +49,14 @@ class UsersGame
     #[Groups(['game:write', 'game:read'])]
     private ?AppUser $owner = null;
 
+    #[ORM\Column(length: 11)]
+    #[Assert\NotBlank]
+    #[Groups(['game:write', 'game:read', 'user:read'])]
+    private ?string $game = null;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIdGame(): ?string
-    {
-        return $this->id_game;
-    }
-
-    public function setIdGame(string $id_game): static
-    {
-        $this->id_game = $id_game;
-
-        return $this;
     }
 
     public function getState(): ?int
@@ -90,6 +79,18 @@ class UsersGame
     public function setOwner(?AppUser $owner): static
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getGame(): ?string
+    {
+        return $this->game;
+    }
+
+    public function setGame(string $game): static
+    {
+        $this->game = $game;
 
         return $this;
     }
