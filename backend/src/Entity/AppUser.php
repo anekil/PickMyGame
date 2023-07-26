@@ -12,9 +12,12 @@ use ApiPlatform\Metadata\ApiResource;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 
 #[ORM\Entity(repositoryClass: AppUserRepository::class)]
 #[ApiResource(
+    shortName: 'Users',
     normalizationContext: [
         'groups' => ['user:read'],
     ],
@@ -23,6 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ]
 )]
 #[UniqueEntity(fields: ['username'], message: 'This username is taken.')]
+#[ApiFilter(PropertyFilter::class)]
 class AppUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]

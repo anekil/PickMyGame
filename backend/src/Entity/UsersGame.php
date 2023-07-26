@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -22,6 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             ],
         ),
         new GetCollection(),
+        new GetCollection(),
         new Post(),
         new Put(),
         new Patch(),
@@ -32,6 +34,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: [
         'groups' => ['game:write'],
     ]
+)]
+#[ApiResource(
+    uriTemplate: '/users/{user_id}/games.{_format}',
+    operations: [new GetCollection()],
+    uriVariables: [
+        'user_id' => new Link(
+            fromProperty: 'usersGames',
+            fromClass: AppUser::class,
+        ),
+    ],
+    normalizationContext: [
+        'groups' => ['game:read', 'game:item:get'],
+    ],
 )]
 class UsersGame
 {
