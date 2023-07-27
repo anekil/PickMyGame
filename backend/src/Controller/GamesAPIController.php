@@ -42,7 +42,6 @@ class GamesAPIController extends AbstractController
             $url .= '&'.$key.'='.$value;
         }
         dump($url);
-        # $url = 'https://api.boardgameatlas.com/api/search?limit=1&pretty=true&client_id=86dlh7CuWH&random=true&fields=id%2Cname%2Cmin_players%2Cmax_players%2Cmin_playtime%2Cmax_playtime%2Cmin_age%2Cdescription%2Cimage_url%2Cmechanics%2Ccategories%2Crules_url%2Caverage_user_rating%2Cdescription_preview';
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -56,10 +55,36 @@ class GamesAPIController extends AbstractController
             CURLOPT_CUSTOMREQUEST => 'GET',
         ));
         $response = curl_exec($curl);
-        if($response !== false)
-            $response = json_decode($response);
+        if($response !== false){
+            $response = json_decode($response, TRUE);
+        }
         curl_close($curl);
-        return $this->json($response);
+
+        dump($response);
+        $fromAPI = $response["games"][0];
+        dump($fromAPI);
+        $toFront = array();
+
+        $temp = '';
+        foreach ($fromAPI["mechanics"] as $mechanic){
+            $temp .= $mechanic["id"].',';
+        }
+        $toFront["mechanics"] = substr($temp,0,-1);
+        unset($fromAPI["mechanics"]);
+
+        $temp = '';
+        foreach ($fromAPI["categories"] as $category){
+            $temp .= $category["id"].',';
+        }
+        $toFront["categories"] = substr($temp,0,-1);
+        unset($fromAPI["categories"]);
+
+        foreach ($fromAPI as $key => $value) {
+            $toFront[$key] = $value;
+        }
+
+        dump($toFront);
+        return $this->json($toFront);
     }
 
     #[Route('/games-api', name: 'app_games_api')]
