@@ -10,7 +10,7 @@ use function Symfony\Component\String\u;
 
 class HomeController extends AbstractController
 {
-    #[Route('/', name: 'app_home')]
+    #[Route('/home', name: 'app_home')]
     public function home(): Response {
         return $this->json([
             'message' => 'Welcome to homepage!',

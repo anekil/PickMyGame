@@ -8,7 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserGameRepository::class)]
 #[ApiResource(
-    security: "is_granted('ROLE_ADMIN') or object.owner == user"
+    openapiContext: ['security' => [['JWT' => []]]],
+    security: "is_granted('ROLE_USER')"
 )]
 class UserGame
 {
