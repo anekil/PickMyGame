@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\UsersGame;
+use App\Entity\UserGame;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<UsersGame>
+ * @extends ServiceEntityRepository<UserGame>
  *
- * @method UsersGame|null find($id, $lockMode = null, $lockVersion = null)
- * @method UsersGame|null findOneBy(array $criteria, array $orderBy = null)
- * @method UsersGame[]    findAll()
- * @method UsersGame[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method UserGame|null find($id, $lockMode = null, $lockVersion = null)
+ * @method UserGame|null findOneBy(array $criteria, array $orderBy = null)
+ * @method UserGame[]    findAll()
+ * @method UserGame[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UsersGameRepository extends ServiceEntityRepository
+class UserGameRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UsersGame::class);
+        parent::__construct($registry, UserGame::class);
     }
 
 //    /**
-//     * @return UsersGame[] Returns an array of UsersGame objects
+//     * @return UserGame[] Returns an array of UserGame objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class UsersGameRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?UsersGame
+//    public function findOneBySomeField($value): ?UserGame
 //    {
 //        return $this->createQueryBuilder('u')
 //            ->andWhere('u.exampleField = :val')

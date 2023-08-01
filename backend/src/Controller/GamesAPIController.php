@@ -86,7 +86,6 @@ class GamesAPIController extends AbstractController
         dump($toFront);
         return $this->json($toFront);
     }
-
     #[Route('/games-api', name: 'app_games_api')]
     public function index(): Response
     {
