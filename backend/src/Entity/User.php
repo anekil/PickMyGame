@@ -2,7 +2,11 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -11,6 +15,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
+#[ApiResource(
+    operations: [new GetCollection()]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -32,6 +39,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $username = null;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: UserGame::class, orphanRemoval: true)]
+    private Collection $userGames;
+
+    public function __construct()
+    {
+        $this->userGames = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -111,6 +126,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(string $username): static
     {
         $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserGame>
+     */
+    public function getUserGames(): Collection
+    {
+        return $this->userGames;
+    }
+
+    public function addUserGame(UserGame $userGame): static
+    {
+        if (!$this->userGames->contains($userGame)) {
+            $this->userGames->add($userGame);
+            $userGame->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserGame(UserGame $userGame): static
+    {
+        if ($this->userGames->removeElement($userGame)) {
+            // set the owning side to null (unless already changed)
+            if ($userGame->getOwner() === $this) {
+                $userGame->setOwner(null);
+            }
+        }
 
         return $this;
     }

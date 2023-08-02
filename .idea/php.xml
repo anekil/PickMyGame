@@ -105,6 +105,7 @@
       <path value="$PROJECT_DIR$/backend/vendor/symfony/options-resolver" />
       <path value="$PROJECT_DIR$/backend/vendor/symfony/polyfill-intl-icu" />
       <path value="$PROJECT_DIR$/backend/vendor/easycorp/easyadmin-bundle" />
+      <path value="$PROJECT_DIR$/backend/vendor/symfonycasts/verify-email-bundle" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1">
