@@ -16,9 +16,9 @@ class UserGameSetOwnerProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-        #if ($data instanceof UserGame && $data->getOwner() === null && $this->security->getUser()) {
+        if ($data instanceof UserGame && $data->getOwner() === null && $this->security->getUser()) {
             $data->setOwner($this->security->getUser());
-        #}
+        }
         $this->innerProcessor->process($data, $operation, $uriVariables, $context);
     }
 }
