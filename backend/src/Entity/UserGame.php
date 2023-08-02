@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -13,8 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: UserGameRepository::class)]
 #[ApiResource(
     operations: [
+        new GetCollection(),
         new Get(security: "is_granted('ROLE_USER') and object.getOwner() == user"),
         new Post(security: "is_granted('ROLE_USER')"),
+        new Delete(security: "is_granted('ROLE_USER') and object.getOwner() == user"),
         new Put(security: "is_granted('ROLE_USER') and object.getOwner() == user",
                 securityPostDenormalize: 'object.getOwner() == user'),
         new Patch(security: "is_granted('ROLE_USER') and object.getOwner() == user",

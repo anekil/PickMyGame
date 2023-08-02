@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: UserGame::class, orphanRemoval: true)]
     private Collection $userGames;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profileImage = null;
+
     public function __construct()
     {
         $this->userGames = new ArrayCollection();
@@ -156,6 +159,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $userGame->setOwner(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProfileImage(): ?string
+    {
+        return $this->profileImage;
+    }
+
+    public function setProfileImage(?string $profileImage): static
+    {
+        $this->profileImage = $profileImage;
 
         return $this;
     }
