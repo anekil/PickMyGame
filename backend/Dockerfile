@@ -14,4 +14,4 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD symfony server:start
+CMD symfony server:stop && symfony server:start

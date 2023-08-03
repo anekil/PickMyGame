@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     operations: [
         new GetCollection(),
-        new Get(security: "is_granted('ROLE_USER') and object.getOwner() == user"),
+        new Get(),
         new Post(security: "is_granted('ROLE_USER')"),
         new Delete(security: "is_granted('ROLE_USER') and object.getOwner() == user"),
         new Put(security: "is_granted('ROLE_USER') and object.getOwner() == user",
