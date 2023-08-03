@@ -17,15 +17,15 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new GetCollection(),
         new Get(),
-        new Post(security: "is_granted('ROLE_USER')"),
-        new Delete(security: "is_granted('ROLE_USER') and object.getOwner() == user"),
-        new Put(security: "is_granted('ROLE_USER') and object.getOwner() == user",
+        new Post(),
+        new Delete(security: "object.getOwner() == user"),
+        new Put(security: "object.getOwner() == user",
                 securityPostDenormalize: 'object.getOwner() == user'),
-        new Patch(security: "is_granted('ROLE_USER') and object.getOwner() == user",
+        new Patch(security: "object.getOwner() == user",
                 securityPostDenormalize: 'object.getOwner() == user'),
     ],
     openapiContext: ['security' => [['JWT' => []]]],
-
+    security: "is_granted('ROLE_USER')",
 )]
 class UserGame
 {
