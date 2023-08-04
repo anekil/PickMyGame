@@ -10,7 +10,7 @@ use App\Entity\UserGame;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 
-final class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
+final class UserGameCurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
 
     public function __construct(private readonly Security $security)
@@ -29,7 +29,7 @@ final class CurrentUserExtension implements QueryCollectionExtensionInterface, Q
 
     private function addWhere(QueryBuilder $queryBuilder, string $resourceClass): void
     {
-        if (is_subclass_of($resourceClass, UserGame::class) || $this->security->isGranted('ROLE_ADMIN') || null === $user = $this->security->getUser()) {
+        if (!is_subclass_of($resourceClass, UserGame::class) || $this->security->isGranted('ROLE_ADMIN') || null === $user = $this->security->getUser()) {
             return;
         }
 
