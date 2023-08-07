@@ -1,29 +1,30 @@
 <?php
 
-namespace App\Controller;
+namespace App\State;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Game;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class GamesAPIController extends AbstractController
+class GameDataProvider implements ProviderInterface
 {
-    #[Route('/get', name: 'app_get_api')]
-    public function askAPI() : JsonResponse {
-        $fromFront = json_decode('{
-            "mechanics": [
-                "fBOTEBUAmV"        
-              ],
-            "categories": [
-                "7rV11PKqME",
-                "nuHYRFmMjU"
-              ],
-            "min_players": 2
-            }', TRUE);
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array|null|object
+    {
+        return $context;
+        //$request = $context;
+        /*$jsonData = json_decode($request->getContent(), true);
+        $toAPI = $this->decodeRequest($jsonData);
+        $response = $this->getDataFromAPI($this->getURL($toAPI));
+        $answer = new Game();
+        $answer->setGameData($this->encodeAnswer($response));
+        return $answer;*/
+    }
+    private function decodeRequest(string $json): array
+    {
+        $fromFront = json_decode($json, TRUE);
         $toAPI = array();
-
-        dump($fromFront);
 
         $toAPI["mechanics"] = implode(',', $fromFront["mechanics"]);
         unset($fromFront["mechanics"]);
@@ -34,15 +35,20 @@ class GamesAPIController extends AbstractController
         foreach ($fromFront as $key => $value) {
             $toAPI[$key] = $value;
         }
+        return $toAPI;
+    }
 
-        dump($toAPI);
-
+    private function getURL(array $toAPI) : string
+    {
         $url = 'https://api.boardgameatlas.com/api/search?limit=1&pretty=true&client_id=86dlh7CuWH&fields=id,name,min_players,max_players,min_playtime,max_playtime,min_age,description,image_url,mechanics,categories,rules_url,average_user_rating,description_preview';
         foreach($toAPI as $key => $value){
             $url .= '&'.$key.'='.$value;
         }
-        dump($url);
+        return $url;
+    }
 
+    private function getDataFromAPI(string $url): bool|string
+    {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url,
@@ -55,42 +61,39 @@ class GamesAPIController extends AbstractController
             CURLOPT_CUSTOMREQUEST => 'GET',
         ));
         $response = curl_exec($curl);
-        if($response !== false){
-            $response = json_decode($response, TRUE);
-        }
         curl_close($curl);
+        return $response;
+    }
 
-        dump($response);
+    private function encodeAnswer($response): array
+    {
+        if($response === false){
+            return [];
+        }
+
+        $response = json_decode($response, TRUE);
+
         $fromAPI = $response["games"][0];
-        dump($fromAPI);
         $toFront = array();
 
-        $temp = '';
+        $temp = array();
         foreach ($fromAPI["mechanics"] as $mechanic){
-            $temp .= $mechanic["id"].',';
+            $temp[] = $mechanic["id"];
         }
-        $toFront["mechanics"] = substr($temp,0,-1);
+        $toFront["mechanics"] = $temp;
         unset($fromAPI["mechanics"]);
 
-        $temp = '';
+        $temp = array();
         foreach ($fromAPI["categories"] as $category){
-            $temp .= $category["id"].',';
+            $temp[] = $category["id"];
         }
-        $toFront["categories"] = substr($temp,0,-1);
+        $toFront["categories"] = $temp;
         unset($fromAPI["categories"]);
 
         foreach ($fromAPI as $key => $value) {
             $toFront[$key] = $value;
         }
 
-        dump($toFront);
-        return $this->json($toFront);
-    }
-    #[Route('/games-api', name: 'app_games_api')]
-    public function index(): Response
-    {
-        return $this->render('games_api/index.html.twig', [
-            'controller_name' => 'GamesAPIController',
-        ]);
+        return $toFront;
     }
 }
