@@ -2,15 +2,42 @@
 
 namespace App\ApiResource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 
-#[ApiResource()]
+#[ApiResource(operations: [])]
 class SearchRequestDto
 {
-    public array $mechanics = [];
-    public array $categories = [];
+    /**
+     * @var string|null
+     */
+    public ?string $mechanics = null;
+    /**
+     * @var string|null
+     */
+    public ?string $categories = null;
+    /**
+     * @var bool
+     */
     public bool $random = false;
-    public int $players = 1;
-    public int $playtime = 0;
-    public int $min_age = 0;
+    /**
+     * @var int|null
+     */
+    public ?int $min_players = null;
+    /**
+     * @var int|null
+     */
+    public ?int $min_playtime = null;
+    /**
+     * @var int|null
+     */
+    public ?int $min_age = null;
+
+    #[ApiProperty(identifier: true)]
+    private ?string $id = null;
+
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
 }

@@ -3,24 +3,29 @@
 namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use App\State\GameDataProvider;
+use ApiPlatform\Metadata\Post;
+use App\State\GameDataProcessor;
 
 #[ApiResource(
-    operations: [new Get(
-        uriTemplate: '/search',
-        defaults: ['id' => 0],
-        input: SearchRequestDto::class,
-        provider: GameDataProvider::class,
-        )])]
+    operations: [
+        new Post(
+            uriTemplate: '/search/',
+            description: 'Search games by parameters',
+            input: SearchRequestDto::class,
+            output: Game::class,
+            processor: GameDataProcessor::class),
+       // new Post(
+       //     uriTemplate: '/search/{name}',
+       //     description: 'Search games by name')
+    ]
+)]
 class Game
 {
     #[ApiProperty(identifier: true)]
     private ?string $id = null;
 
-    private ?array $gameData = null;
-
-    /*private ?string $name;
+    private ?string $apiId;
+    private string $name;
     private ?string $description;
     private ?string $image_url;
     private ?string $rules_url;
@@ -30,28 +35,17 @@ class Game
     private ?int $min_playtime;
     private ?int $max_playtime;
     private ?int $min_age;
-    private Collection $categories;
-    private Collection $mechanics;
-    private ?float $average_user_rating;*/
+    private ?string $categories;
+    private ?string $mechanics;
+    private ?float $average_user_rating;
 
     public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getGameData(): ?array
+    public function setGameData($data)
     {
-        return $this->gameData;
-    }
-
-    /**
-     * @param array|null $gameData
-     */
-    public function setGameData(?array $gameData): void
-    {
-        $this->gameData = $gameData;
+        $this->name = json_encode($data);
     }
 }

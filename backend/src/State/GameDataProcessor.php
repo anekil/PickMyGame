@@ -3,46 +3,25 @@
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Game;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class GameDataProvider implements ProviderInterface
+class GameDataProcessor implements ProcessorInterface
 {
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array|null|object
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Game
     {
-        return $context;
-        //$request = $context;
-        /*$jsonData = json_decode($request->getContent(), true);
-        $toAPI = $this->decodeRequest($jsonData);
-        $response = $this->getDataFromAPI($this->getURL($toAPI));
+        $response = $this->getDataFromAPI($this->getURL($data));
         $answer = new Game();
         $answer->setGameData($this->encodeAnswer($response));
-        return $answer;*/
-    }
-    private function decodeRequest(string $json): array
-    {
-        $fromFront = json_decode($json, TRUE);
-        $toAPI = array();
-
-        $toAPI["mechanics"] = implode(',', $fromFront["mechanics"]);
-        unset($fromFront["mechanics"]);
-
-        $toAPI["categories"] = implode(',', $fromFront["categories"]);
-        unset($fromFront["categories"]);
-
-        foreach ($fromFront as $key => $value) {
-            $toAPI[$key] = $value;
-        }
-        return $toAPI;
+        return $answer;
     }
 
-    private function getURL(array $toAPI) : string
+    private function getURL($toAPI) : string
     {
         $url = 'https://api.boardgameatlas.com/api/search?limit=1&pretty=true&client_id=86dlh7CuWH&fields=id,name,min_players,max_players,min_playtime,max_playtime,min_age,description,image_url,mechanics,categories,rules_url,average_user_rating,description_preview';
         foreach($toAPI as $key => $value){
-            $url .= '&'.$key.'='.$value;
+            if($value !== null)
+                $url .= '&'.$key.'='.$value;
         }
         return $url;
     }
@@ -72,6 +51,10 @@ class GameDataProvider implements ProviderInterface
         }
 
         $response = json_decode($response, TRUE);
+
+        if(!$response["games"]){
+            return [];
+        }
 
         $fromAPI = $response["games"][0];
         $toFront = array();
