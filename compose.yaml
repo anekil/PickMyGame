@@ -13,17 +13,17 @@ services:
       - backend-db
       - backend-frontend
 
-  frontend:
-    build:
-      context: frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-    environment:
-      NODE_ENV: development
-    networks:
-      - backend-frontend
+  # frontend:
+  #  build:
+  #    context: frontend
+  #  ports:
+  #    - "3000:3000"
+  #  volumes:
+  #    - ./frontend:/app
+  #  environment:
+  #    NODE_ENV: development
+  #  networks:
+  #    - backend-frontend
 
   database:
     image: postgres

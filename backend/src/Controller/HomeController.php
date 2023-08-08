@@ -17,14 +17,4 @@ class HomeController extends AbstractController
             'path' => 'src/Controller/HomeController.php',
         ]);
     }
-
-    #[Route('/game_{name}', name: 'app_game_details')]
-    public function getGame($name): JsonResponse {
-        $message = u($name)->title(true);
-
-        return $this->json([
-            'message' => $message.' is an awesome game!',
-            'path' => 'src/Controller/HomeController.php',
-        ]);
-    }
 }
