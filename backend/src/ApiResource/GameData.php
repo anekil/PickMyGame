@@ -4,22 +4,19 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
-use App\State\GameDataProcessor;
+use App\Controller\GameController;
 
 #[ApiResource(
     operations: [
         new Post(
             uriTemplate: '/search/',
+            defaults: ['_api_persist' => false],
+            controller: GameController::class,
             description: 'Search games by parameters',
-            input: SearchRequestDto::class,
-            output: Game::class,
-            processor: GameDataProcessor::class),
-       // new Post(
-       //     uriTemplate: '/search/{name}',
-       //     description: 'Search games by name')
+            input: SearchRequestDto::class)
     ]
 )]
-class Game
+class GameData
 {
     #[ApiProperty(identifier: true)]
     private ?string $id = null;
@@ -44,8 +41,14 @@ class Game
         return $this->id;
     }
 
-    public function setGameData($data)
+    public function getName(): ?string
     {
-        $this->name = json_encode($data);
+        return $this->name;
+    }
+
+    public function setGameData($data): GameData
+    {
+        $this->name = $data;
+        return $this;
     }
 }
