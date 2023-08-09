@@ -2,18 +2,22 @@
 
 namespace App\Controller;
 
+use App\ApiResource\GameData;
 use App\Repository\CategoryRepository;
 use App\Repository\MechanicRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use function Symfony\Component\Translation\t;
 
 class GameController extends AbstractController
 {
@@ -24,6 +28,7 @@ class GameController extends AbstractController
      */
     public function __construct(private readonly RequestStack        $requestStack,
                                 private readonly HttpClientInterface $client,
+                                private readonly SerializerInterface $serializer,
                                 private readonly MechanicRepository  $mechanicRepository,
                                 private readonly CategoryRepository  $categoryRepository)
     {}
@@ -38,12 +43,13 @@ class GameController extends AbstractController
         if ($request) {
             $data = json_decode($request->getContent(), true);
 
-            $response = $this->getDataFromAPI($this->getURL($data));
-            if(!$response["status"]){
-                return new JsonResponse($response);
+            try {
+                $response = $this->getDataFromAPI($this->getURL($data));
+                $response = $this->processResponse($response);
+                return new JsonResponse($this->serializer->serialize($response, 'json'));
+            } catch (ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
+                throw new Exception('Problem with connection');
             }
-
-            return new JsonResponse(["status" => true, "data" => $this->processResponse($response["data"])]);
         }
         throw new Exception('No parameters');
     }
@@ -58,25 +64,25 @@ class GameController extends AbstractController
         return $url;
     }
 
-    private function getDataFromAPI(string $url): array
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    private function getDataFromAPI(string $url): GameData
     {
-        try {
-            $response = $this->client->request('GET', $url);
-            $statusCode = $response->getStatusCode();
-            if($statusCode === 200)
-                return ["status" => true, "data" => $response->toArray()];
-            else
-                return ["status" => false, "data" => (string)$statusCode];
-        } catch (TransportExceptionInterface|ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $e) {
-            return ["status" => false, "data" => $e->getMessage()];
-        }
+        $response = $this->client->request('GET', $url);
+        $data = json_decode($response->getContent(), true);
+        $data = $data['games'][0];
+        $data = json_encode($data, true);
+        return $this->serializer->deserialize($data, GameData::class, 'json');
     }
 
-    private function processResponse($data)
+    private function processResponse(GameData $data): GameData
     {
-        $data = $data["games"][0];
-        $data["mechanics"] = $this->changeIdToName($data["mechanics"], $this->mechanicRepository);
-        $data["categories"] = $this->changeIdToName($data["categories"], $this->categoryRepository);
+        $data->setMechanics($this->changeIdToName($data->getMechanics(), $this->mechanicRepository));
+        $data->setCategories($this->changeIdToName($data->getCategories(), $this->categoryRepository));
         return $data;
     }
 
