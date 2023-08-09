@@ -5,22 +5,31 @@ namespace App\Command;
 use App\Entity\Category;
 use App\Entity\Mechanic;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 #[AsCommand(
     name: 'app:get-categories-and-mechanics',
     description: 'Add a short description for your command',
 )]
 class GetCategoriesAndMechanicsCommand extends Command
 {
-    private $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager,
+                                private ContainerBagInterface $params,
+                                private readonly HttpClientInterface $client)
     {
-        $this->entityManager = $entityManager;
         parent::__construct();
     }
 
@@ -28,63 +37,47 @@ class GetCategoriesAndMechanicsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $categories = $this->getDataFromAPI('https://api.boardgameatlas.com/api/game/categories?client_id=86dlh7CuWH');
-        $mechanics = $this->getDataFromAPI('https://api.boardgameatlas.com/api/game/mechanics?client_id=86dlh7CuWH');
+        try {
+            $categories = $this->getDataFromAPI($this->params->get('get_categories_url'));
+            $mechanics = $this->getDataFromAPI($this->params->get('get_mechanics_url'));
 
-        if($categories === false || $mechanics === false){
-            $io->success('Error occurred when downloading data.');
+            if(!$categories["status"] || !$mechanics["status"] ){
+                $io->success('Error occurred when downloading data.');
+                return Command::FAILURE;
+            }
+
+            $this->saveItems($categories["data"]["categories"], Category::class);
+            $this->saveItems($mechanics["data"]["mechanics"],  Mechanic::class);
+
+            $io->success('Successfully downloaded and saved categories and mechanics.');
+            return Command::SUCCESS;
+
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             return Command::FAILURE;
         }
-
-        $this->saveCategories($categories);
-        $this->saveMechanics($mechanics);
-
-        $io->success('Successfully downloaded and saved categories and mechanics.');
-        return Command::SUCCESS;
     }
 
-    private function getDataFromAPI(string $url): bool|string
+    private function getDataFromAPI(string $url): array
     {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response = curl_exec($curl);
-        curl_close($curl);
-        return $response;
-    }
-
-    private function saveCategories($categories) : void
-    {
-        $categories = json_decode($categories, TRUE);
-        $categories = $categories['categories'];
-
-        foreach ($categories as $category) {
-            $newCategory = new Category();
-            $newCategory->setName($category['name'])
-                ->setApiId($category['id']);
-            $this->entityManager->persist($newCategory);
+        try {
+            $response = $this->client->request('GET', $url);
+            $statusCode = $response->getStatusCode();
+            if($statusCode === 200)
+                return ["status" => true, "data" => $response->toArray()];
+            else
+                return ["status" => false, "data" => (string)$statusCode];
+        } catch (TransportExceptionInterface|ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $e) {
+            return ["status" => false, "data" => $e->getMessage()];
         }
-        $this->entityManager->flush();
     }
 
-    private function saveMechanics($mechanics) : void
+    private function saveItems($items,  $class) : void
     {
-        $mechanics = json_decode($mechanics, TRUE);
-        $mechanics = $mechanics['mechanics'];
-
-        foreach ($mechanics as $mechanic) {
-            $newMechanic = new Mechanic();
-            $newMechanic->setName($mechanic['name'])
-                ->setApiId($mechanic['id']);
-            $this->entityManager->persist($newMechanic);
+        foreach ($items as $item) {
+            $newItem = new $class;
+            $newItem->setName($item['name'])
+                    ->setApiId($item['id']);
+            $this->entityManager->persist($newItem);
         }
         $this->entityManager->flush();
     }
