@@ -9,20 +9,19 @@ use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use function Symfony\Component\Translation\t;
 
 class GameController extends AbstractController
 {
     /**
      * @param RequestStack $requestStack
+     * @param HttpClientInterface $client
+     * @param SerializerInterface $serializer
      * @param MechanicRepository $mechanicRepository
      * @param CategoryRepository $categoryRepository
      */
@@ -33,7 +32,6 @@ class GameController extends AbstractController
                                 private readonly CategoryRepository  $categoryRepository)
     {}
 
-    // TODO: work on error handling
     /**
      * @throws Exception
      */
@@ -46,8 +44,8 @@ class GameController extends AbstractController
             try {
                 $response = $this->getDataFromAPI($this->getURL($data));
                 $response = $this->processResponse($response);
-                return new JsonResponse($this->serializer->serialize($response, 'json'));
-            } catch (ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
+                return new JsonResponse($this->serializer->serialize($response, 'json'), 200, [], true);
+            } catch (ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
                 throw new Exception('Problem with connection');
             }
         }
