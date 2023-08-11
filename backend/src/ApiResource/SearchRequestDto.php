@@ -4,7 +4,7 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 
-#[ApiResource()]
+#[ApiResource(operations: [])]
 class SearchRequestDto
 {
     public ?string $mechanics = null;
