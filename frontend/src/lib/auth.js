@@ -9,22 +9,39 @@ export const authOptions = {
                 password: { label: 'password', type: 'password' }
             },
             async authorize (credentials) {
-                const url = process.env.BACKEND_URL + 'login_check'
-                const res = await fetch(url, {
+                let url = process.env.BACKEND_URL + 'login_check'
+                let res = await fetch(url, {
                     method: 'POST',
                     body: JSON.stringify(credentials),
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 })
+                const token = await res.json();
+                console.log("token: " + JSON.stringify(token) + "\nresponse: " + res.ok)
+                if (!res.ok || !token) {
+                    return null;
+                }
+
+                url = process.env.BACKEND_URL + 'profile'
+                res = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token.token
+                    }
+                })
                 const user = await res.json();
+                console.log("user: " + JSON.stringify(user) + "\nresponse: " + res.ok)
                 if (res.ok && user) {
-                    console.log(user);
-                    return user;
+                    return {
+                        token: token.token,
+                        user: user
+                    };
                 } else {
                     return null;
                 }
-            },
+            }
         }),
     ],
 
