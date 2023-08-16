@@ -3,7 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 export const authOptions = {
     providers: [
         CredentialsProvider({
-            name: 'Login',
             credentials: {
                 username: { label: 'username', type: 'text' },
                 password: { label: 'password', type: 'password' }
@@ -18,7 +17,6 @@ export const authOptions = {
                     }
                 })
                 const token = await res.json();
-                console.log("token: " + JSON.stringify(token) + "\nresponse: " + res.ok)
                 if (!res.ok || !token) {
                     return null;
                 }
@@ -32,11 +30,10 @@ export const authOptions = {
                     }
                 })
                 const user = await res.json();
-                console.log("user: " + JSON.stringify(user) + "\nresponse: " + res.ok)
                 if (res.ok && user) {
                     return {
                         token: token.token,
-                        user: user
+                        user
                     };
                 } else {
                     return null;
@@ -46,15 +43,16 @@ export const authOptions = {
     ],
 
     callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.user = user.user;
+                token.token = user.token;
+            }
+            return token;
+        },
         async session({ session, token }) {
             session.user = token.user;
             return session;
-        },
-        async jwt({ token, user }) {
-            if (user) {
-                token.user = user;
-            }
-            return token;
         },
     },
 }

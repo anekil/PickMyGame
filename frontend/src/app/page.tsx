@@ -9,18 +9,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export default async function Home() {
-    const session = await getServerSession(authOptions);
-    console.log(session);
+    const session = await getServerSession(authOptions)
 
     return (
-        <main
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "70vh",
-            }}
-        >
+        <main>
             <div>
                 <LoginButton />
                 <RegisterButton />
@@ -28,9 +20,12 @@ export default async function Home() {
                 <ProfileButton />
 
                 <h1>Server Session</h1>
-                <pre>{JSON.stringify(session)}</pre>
-
-                <User />
+                {session != null ? (
+                    <pre>{JSON.stringify(session, null, 2)}</pre>
+                ) : (
+                    <>no session</>
+                )}
+                <User {...session} />
             </div>
         </main>
     );
