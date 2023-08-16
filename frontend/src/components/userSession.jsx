@@ -1,6 +1,4 @@
-"use client";
-
-export const User = (session) => {
+export const UserSession = (session) => {
 
     return (
         <>
