@@ -9,7 +9,7 @@ use App\Controller\GameController;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/search/',
+            uriTemplate: '/search',
             defaults: ['_api_persist' => false],
             controller: GameController::class,
             description: 'Search games by parameters',

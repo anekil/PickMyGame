@@ -4,7 +4,8 @@ import {InputProps, Slider} from "@mui/material";
 import {Card, CardBody, CardHeader, Divider, Input} from "@nextui-org/react";
 import React, {ComponentType} from "react";
 import {SearchIcon} from "@nextui-org/shared-icons";
-import {SelectCategoriesList, SelectMechanicsList} from "@/components/lists";
+import { createContext, useContext } from 'react';
+import {SelectList} from "@/components/lists";
 
 type CardProps = {
     Input: ComponentType<InputProps>;
@@ -25,7 +26,10 @@ const InputCard = ({ name, Input, }: CardProps) => {
     );
 }
 
+export const OptionContext = createContext("");
 export const SearchForm = () => {
+
+
     return (
         <div>
             <InputCard Input={SearchGameInput} name={"Game name"}/>
@@ -34,16 +38,17 @@ export const SearchForm = () => {
                 <InputCard Input={PlaytimeInput} name={"Playtime range"}/>
             </div>
             <div className="gap-2 grid grid-cols-2 grid-rows-1">
-                <InputCard Input={SelectMechanicsList} name={"Mechanics"}/>
-                <InputCard Input={SelectCategoriesList} name={"Categories"}/>
+                <OptionContext.Provider value="categories">
+                    <InputCard Input={SelectList} name={"Categories"}/>
+                </OptionContext.Provider>
+                <OptionContext.Provider value="mechanics">
+                    <InputCard Input={SelectList} name={"Mechanics"}/>
+                </OptionContext.Provider>
             </div>
         </div>
     );
 }
 
-function valuetext(value: number) {
-    return `${value}`;
-}
 
 const SearchGameInput = () => {
     return (
@@ -59,12 +64,16 @@ const SearchGameInput = () => {
 }
 
 const PlayersNumberInput = () => {
+    const [value, setValue] = React.useState(2);
+
+    const handleSubmit = (event: any) => {
+        event.preventDefault();
+    };
 
     return (
         <Slider
+            onChange={(_, val) => setValue(val as number)}
             aria-label="Players"
-            defaultValue={2}
-            getAriaValueText={valuetext}
             valueLabelDisplay="on"
             step={1}
             marks
@@ -75,18 +84,14 @@ const PlayersNumberInput = () => {
 };
 
 const PlaytimeInput = () => {
-    const [value, setValue] = React.useState<number[]>([20, 37]);
-    const handleChange = (event: Event, newValue: number | number[]) => {
-        setValue(newValue as number[]);
-    };
+    const [value, setValue] = React.useState<number[]>([10, 20]);
 
     return (
         <Slider
             getAriaLabel={() => 'Playtime range'}
             value={value}
-            onChange={handleChange}
+            onChange={(_, val) => setValue(val as number[])}
             valueLabelDisplay="on"
-            getAriaValueText={valuetext}
         />
     );
 };
