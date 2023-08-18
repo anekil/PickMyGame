@@ -1,13 +1,12 @@
 "use client";
 
 import { signIn, signOut } from "next-auth/react";
+import {Button} from "@mui/material";
 import Link from "next/link";
 
 export const LoginButton = () => {
     return (
-        <button style={{ marginRight: 10 }} onClick={() => signIn()}>
-            Sign in
-        </button>
+        <Button variant="contained" onClick={() => signIn()}>Sign in</Button>
     );
 };
 
@@ -21,9 +20,7 @@ export const RegisterButton = () => {
 
 export const LogoutButton = () => {
     return (
-        <button style={{ marginRight: 10 }} onClick={() => signOut()}>
-            Sign Out
-        </button>
+        <Button variant="outlined" onClick={() => signOut()}>Sign out</Button>
     );
 };
 
