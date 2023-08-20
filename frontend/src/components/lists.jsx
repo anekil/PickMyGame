@@ -5,6 +5,7 @@ import React from "react";
 import {CheckboxGroup, Checkbox} from "@nextui-org/react";
 import { useContext } from 'react';
 import {OptionContext} from "./searchComponents";
+import {useParametersStore} from "@/components/searchParameters";
 
 // TODO docker address
 const fetcher = axios.create({ baseURL: 'http://127.0.0.1:8000/api/'});
@@ -37,9 +38,18 @@ const ApiList = () =>  {
     );
 }
 
-export const SelectList = () => {
+export function SelectList() {
     const [groupSelected, setGroupSelected] = React.useState([]);
     const option = useContext(OptionContext);
+
+    const handleChange = (value) => {
+        setGroupSelected(value);
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        useParametersStore((state) => state.setMechanicsOrCategories(option, groupSelected.join(",")));
+    };
 
     return (
         <>
@@ -49,7 +59,8 @@ export const SelectList = () => {
                     label={"Select " + option}
                     color="warning"
                     value={groupSelected}
-                    onValueChange={setGroupSelected}
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
                 >
                     { ApiList(option) }
                 </CheckboxGroup>
