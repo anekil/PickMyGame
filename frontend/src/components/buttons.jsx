@@ -4,22 +4,29 @@ import { signIn, signOut } from "next-auth/react";
 import {Button} from "@mui/material";
 import Link from "next/link";
 import React from "react";
-import {useParametersStore} from "@/components/searchParameters";
+import useParameters from "@/components/store/searchParameters";
 
 export function SubmitButton() {
+    const state = useParameters()
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = {
-            min_players: useParametersStore((state) => state.players),
-            max_players: useParametersStore((state) => state.players),
-            min_playtime: useParametersStore((state) => state.playtime[0]),
-            max_playtime: useParametersStore((state) => state.playtime[1]),
-            categories: useParametersStore((state) => state.categories),
-            mechanics: useParametersStore((state) => state.mechanics)
+
+        let data = {
+            name: state.title,
+            min_players: state.players,
+            max_players: state.players,
+            min_playtime: state.playtime[0],
+            max_playtime:  state.playtime[1],
+            categories: state.categories,
+            mechanics: state.mechanics
         };
 
+        console.log(data);
+
         const jsonData = JSON.stringify(data);
-        const url = process.env.BACKEND_URL + 'search';
+        //const url = process.env.BACKEND_URL + 'search';
+        const url = 'http://127.0.0.1:8000/api/' + 'search';
 
         const options = {
             method: 'POST',
@@ -33,7 +40,7 @@ export function SubmitButton() {
         const response = await fetch(url, options);
         const result = await response.json();
         console.log(result);
-        useParametersStore((state) => state.clearStore());
+        state.clearStore();
     }
 
     return (
@@ -63,4 +70,8 @@ export const LogoutButton = () => {
 
 export const ProfileButton = () => {
     return <Link href="/profile">Profile</Link>;
+};
+
+export const SearchPageButton = () => {
+    return <Link href="/search">Search games</Link>;
 };

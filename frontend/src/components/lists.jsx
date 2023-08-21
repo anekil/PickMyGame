@@ -5,9 +5,8 @@ import React from "react";
 import {CheckboxGroup, Checkbox} from "@nextui-org/react";
 import { useContext } from 'react';
 import {OptionContext} from "./searchComponents";
-import {useParametersStore} from "@/components/searchParameters";
+import useParameters from "@/components/store/searchParameters";
 
-// TODO docker address
 const fetcher = axios.create({ baseURL: 'http://127.0.0.1:8000/api/'});
 
 const listItems = async (handle) => {
@@ -34,11 +33,11 @@ const ApiList = () =>  {
     );
 
     return items.map(item =>
-        <Checkbox value={item.api_id}>{item.name}</Checkbox>
+        <Checkbox value={item.api_id} key={item.api_id}>{item.name}</Checkbox>
     );
 }
 
-export function SelectList() {
+export function SelectList(name) {
     const [groupSelected, setGroupSelected] = React.useState([]);
     const option = useContext(OptionContext);
 
@@ -48,7 +47,8 @@ export function SelectList() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        useParametersStore((state) => state.setMechanicsOrCategories(option, groupSelected.join(",")));
+        useParameters((state) => state.setMechanicsOrCategories(option, groupSelected.join(",")));
+        onSubmit({ [name]: groupSelected.join(",") }); // Adjust inputValue based on your actual logic
     };
 
     return (
@@ -56,6 +56,7 @@ export function SelectList() {
             <p className="text-default-500">Selected: {groupSelected.join(",")}</p>
             <div className="flex flex-col gap-4 h-[500px]">
                 <CheckboxGroup
+                    name={ name }
                     label={"Select " + option}
                     color="warning"
                     value={groupSelected}
