@@ -17,10 +17,10 @@ export const ApiList = (handle) =>  {
     handle = handle["option"] + '?page=1';
     const {data: items, isLoading, error} = swr(handle, listItems);
 
-    if (error) return "An error has occurred";
-    if (isLoading) return "Loading...";
+    if (error) return (<p>An error has occurred</p>);
+    if (isLoading) return (<p>Loading..</p>);
     const result  = items.map(item =>
-        <Checkbox value={item.api_id}>{item.name}</Checkbox>
+        <Checkbox value={item.api_id} key={item.api_id}>{item.name}</Checkbox>
     );
 
     return (
