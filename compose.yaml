@@ -6,6 +6,7 @@ services:
       - '8000:8000'
     volumes:
       - ./backend:/app
+    stop_signal: SIGINT
     depends_on:
       database:
         condition: service_healthy

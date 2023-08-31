@@ -3,46 +3,69 @@ import swr from 'swr'
 import axios from "axios";
 import React from "react";
 import {CheckboxGroup, Checkbox} from "@nextui-org/react";
+import { useContext } from 'react';
+import {OptionContext} from "./searchComponents";
+import useParameters from "@/components/store/searchParameters";
 
-
-// TODO docker address
 const fetcher = axios.create({ baseURL: 'http://127.0.0.1:8000/api/'});
 
-export const listItems = async (handle) => {
+const listItems = async (handle) => {
     const result = await fetcher.get(handle, { headers: { accept: "application/json" } });
     return result.data;
 }
 
-export const ApiList = (handle) =>  {
-    handle = handle["option"] + '?page=1';
+const ApiList = () =>  {
+    const option = useContext(OptionContext);
+    let handle = option +'?page=1';
+    console.log("list:" + handle)
     const {data: items, isLoading, error} = swr(handle, listItems);
 
-    if (error) return (<p>An error has occurred</p>);
-    if (isLoading) return (<p>Loading..</p>);
-    const result  = items.map(item =>
-        <Checkbox value={item.api_id} key={item.api_id}>{item.name}</Checkbox>
+    if (error) return (
+        <p>
+            An error has occurred
+        </p>
     );
 
-    return (
-        <>{result}</>
+    if (isLoading) return (
+        <p>
+            Loading...
+        </p>
+    );
+
+    return items.map(item =>
+        <Checkbox value={item.api_id} key={item.api_id}>{item.name}</Checkbox>
     );
 }
 
-export default function App(option) {
-    option = option["option"];
+export function SelectList(name) {
     const [groupSelected, setGroupSelected] = React.useState([]);
+    const option = useContext(OptionContext);
+
+    const handleChange = (value) => {
+        setGroupSelected(value);
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        useParameters((state) => state.setMechanicsOrCategories(option, groupSelected.join(",")));
+        onSubmit({ [name]: groupSelected.join(",") }); // Adjust inputValue based on your actual logic
+    };
 
     return (
-        <div className="flex flex-col gap-3">
+        <>
             <p className="text-default-500">Selected: {groupSelected.join(",")}</p>
-            <CheckboxGroup
-                label={"Select " + option}
-                color="warning"
-                value={groupSelected}
-                onValueChange={setGroupSelected}
-            >
-                { ApiList(option) }
-            </CheckboxGroup>
-        </div>
+            <div className="flex flex-col gap-4 h-[500px]">
+                <CheckboxGroup
+                    name={ name }
+                    label={"Select " + option}
+                    color="warning"
+                    value={groupSelected}
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                >
+                    { ApiList(option) }
+                </CheckboxGroup>
+            </div>
+        </>
     );
 }
