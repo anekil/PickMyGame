@@ -17,7 +17,7 @@ export function SubmitButton() {
             min_players: state.players,
             max_players: state.players,
             min_playtime: state.playtime[0],
-            max_playtime:  state.playtime[1],
+            max_playtime: state.playtime[1],
             categories: state.categories,
             mechanics: state.mechanics
         };
@@ -73,5 +73,5 @@ export const ProfileButton = () => {
 };
 
 export const SearchPageButton = () => {
-    return <Link href="/search">Search games</Link>;
+    return <Link href="/home/aneta/Documents/PickMyBoardGame/frontend/src/components/searchForm">Search games</Link>;
 };
