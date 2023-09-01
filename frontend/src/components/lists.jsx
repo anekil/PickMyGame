@@ -2,10 +2,9 @@
 import swr from 'swr'
 import axios from "axios";
 import React from "react";
-import {CheckboxGroup, Checkbox} from "@nextui-org/react";
 import { useContext } from 'react';
-import {OptionContext} from "./searchComponents";
-import useParameters from "@/components/store/searchParameters";
+import {Field} from "formik";
+import {OptionContext} from "./searchForm";
 
 const fetcher = axios.create({ baseURL: 'http://127.0.0.1:8000/api/'});
 
@@ -14,10 +13,11 @@ const listItems = async (handle) => {
     return result.data;
 }
 
-const ApiList = () =>  {
+export const OptionsList = () =>  {
     const option = useContext(OptionContext);
     let handle = option +'?page=1';
-    console.log("list:" + handle)
+    console.log(handle)
+
     const {data: items, isLoading, error} = swr(handle, listItems);
 
     if (error) return (
@@ -33,39 +33,9 @@ const ApiList = () =>  {
     );
 
     return items.map(item =>
-        <Checkbox value={item.api_id} key={item.api_id}>{item.name}</Checkbox>
-    );
-}
-
-export function SelectList(name) {
-    const [groupSelected, setGroupSelected] = React.useState([]);
-    const option = useContext(OptionContext);
-
-    const handleChange = (value) => {
-        setGroupSelected(value);
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        useParameters((state) => state.setMechanicsOrCategories(option, groupSelected.join(",")));
-        onSubmit({ [name]: groupSelected.join(",") }); // Adjust inputValue based on your actual logic
-    };
-
-    return (
-        <>
-            <p className="text-default-500">Selected: {groupSelected.join(",")}</p>
-            <div className="flex flex-col gap-4 h-[500px]">
-                <CheckboxGroup
-                    name={ name }
-                    label={"Select " + option}
-                    color="warning"
-                    value={groupSelected}
-                    onChange={handleChange}
-                    onSubmit={handleSubmit}
-                >
-                    { ApiList(option) }
-                </CheckboxGroup>
-            </div>
-        </>
+        <label>
+            <Field name={option} type="checkbox" value={item.api_id}/>
+            {item.name}
+        </label>
     );
 }
