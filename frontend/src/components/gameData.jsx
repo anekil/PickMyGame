@@ -1,6 +1,8 @@
+import {useRouter} from "next/navigation";
 
-export const GameData = ({ gameString }) => {
-    let data = JSON.parse(gameString);
+export const GameData = () => {
+    const router = useRouter();
+    const data = JSON.parse(router.query.game);
 
     return (
         <div>

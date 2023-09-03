@@ -1,26 +1,42 @@
 "use client";
-import { createContext } from 'react';
+import React, { createContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import Slider from '@mui/material/Slider';
 import {OptionsList} from "./lists";
+import {useRouter} from "next/navigation";
+import {Button} from "@mui/material";
 
 export const OptionContext = createContext("");
 
-const SearchForm = () => {
-    const initialValues = {
-        title: '',
-        players: 4,
-        playtime: [10, 180],
-        categories: [],
-        mechanics: [],
-    };
+const SearchForm = ({ initialValues }) => {
+    const router = useRouter();
 
-    const handleSubmit = (values) => {
-        alert(JSON.stringify(values, null, 2));
+    const handleSubmit = async (values) => {
+        const url = "http://localhost:8000/api/search";
+        alert(JSON.stringify(values))
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(values),
+        };
+
+        const response = await fetch(url, options);
+        const game = await response.json();
+
+        alert(JSON.stringify(game))
+
+        router.push({
+            pathname: '/about',
+            query: { game: JSON.stringify(game) },
+        });
     };
 
     return (
-        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+        <Formik initialValues={initialValues} onSubmit={(values) => {handleSubmit(values).then()}}>
             <Form>
                 <div>
                     <label htmlFor="title">Game Title</label>
@@ -79,9 +95,7 @@ const SearchForm = () => {
                     </OptionContext.Provider>
                 </div>
 
-                <div>
-                    <button type="submit">Search</button>
-                </div>
+                <Button variant="contained" type="submit">Search</Button>
             </Form>
         </Formik>
     );
