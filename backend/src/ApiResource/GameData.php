@@ -4,52 +4,43 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
-use App\Controller\GameController;
+use App\Controller\GameSearchController;
 
 #[ApiResource(
     operations: [
         new Post(
             uriTemplate: '/search',
             defaults: ['_api_persist' => false],
-            controller: GameController::class,
+            controller: GameSearchController::class,
             description: 'Search games by parameters',
             input: SearchRequestDto::class)
     ]
 )]
 class GameData
 {
-    private string $id;
-    private string $name;
-
-    private ?int $min_players;
-    private ?int $max_players;
-    private ?int $min_playtime;
-    private ?int $max_playtime;
-    private ?int $min_age;
-
-    private ?string $image_url;
-    private ?string $description;
-    private ?string $description_preview;
-    private ?string $rules_url;
-
-    private ?float $average_user_rating;
-
-    private array $mechanics;
-    private array $categories;
-
+    private int     $id = 0;
+    private string  $name;
+    private ?string $summary;
+    private ?string $url;
+    private ?float  $total_rating;
+    private ?array  $genres;
+    private ?array  $themes;
+    private ?array  $keywords;
+    private ?array  $multiplayer_modes;
+    private ?array  $platforms;
 
     /**
-     * @return string
+     * @return int
      */
-    public function getId(): string
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
-     * @param string $id
+     * @param int $id
      */
-    public function setId(string $id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -71,194 +62,132 @@ class GameData
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getMinPlayers(): ?int
+    public function getSummary(): ?string
     {
-        return $this->min_players;
+        return $this->summary;
     }
 
     /**
-     * @param int|null $min_players
+     * @param string|null $summary
      */
-    public function setMinPlayers(?int $min_players): void
+    public function setSummary(?string $summary): void
     {
-        $this->min_players = $min_players;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getMaxPlayers(): ?int
-    {
-        return $this->max_players;
-    }
-
-    /**
-     * @param int|null $max_players
-     */
-    public function setMaxPlayers(?int $max_players): void
-    {
-        $this->max_players = $max_players;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getMinPlaytime(): ?int
-    {
-        return $this->min_playtime;
-    }
-
-    /**
-     * @param int|null $min_playtime
-     */
-    public function setMinPlaytime(?int $min_playtime): void
-    {
-        $this->min_playtime = $min_playtime;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getMaxPlaytime(): ?int
-    {
-        return $this->max_playtime;
-    }
-
-    /**
-     * @param int|null $max_playtime
-     */
-    public function setMaxPlaytime(?int $max_playtime): void
-    {
-        $this->max_playtime = $max_playtime;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getMinAge(): ?int
-    {
-        return $this->min_age;
-    }
-
-    /**
-     * @param int|null $min_age
-     */
-    public function setMinAge(?int $min_age): void
-    {
-        $this->min_age = $min_age;
+        $this->summary = $summary;
     }
 
     /**
      * @return string|null
      */
-    public function getImageUrl(): ?string
+    public function getUrl(): ?string
     {
-        return $this->image_url;
+        return $this->url;
     }
 
     /**
-     * @param string|null $image_url
+     * @param string|null $url
      */
-    public function setImageUrl(?string $image_url): void
+    public function setUrl(?string $url): void
     {
-        $this->image_url = $image_url;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param string|null $description
-     */
-    public function setDescription(?string $description): void
-    {
-        $this->description = $description;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDescriptionPreview(): ?string
-    {
-        return $this->description_preview;
-    }
-
-    /**
-     * @param string|null $description_preview
-     */
-    public function setDescriptionPreview(?string $description_preview): void
-    {
-        $this->description_preview = $description_preview;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRulesUrl(): ?string
-    {
-        return $this->rules_url;
-    }
-
-    /**
-     * @param string|null $rules_url
-     */
-    public function setRulesUrl(?string $rules_url): void
-    {
-        $this->rules_url = $rules_url;
+        $this->url = $url;
     }
 
     /**
      * @return float|null
      */
-    public function getAverageUserRating(): ?float
+    public function getTotalRating(): ?float
     {
-        return $this->average_user_rating;
+        return $this->total_rating;
     }
 
     /**
-     * @param float|null $average_user_rating
+     * @param float|null $total_rating
      */
-    public function setAverageUserRating(?float $average_user_rating): void
+    public function setTotalRating(?float $total_rating): void
     {
-        $this->average_user_rating = $average_user_rating;
+        $this->total_rating = $total_rating;
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getMechanics(): array
+    public function getGenres(): ?array
     {
-        return $this->mechanics;
+        return $this->genres;
     }
 
     /**
-     * @param array $mechanics
+     * @param array|null $genres
      */
-    public function setMechanics(array $mechanics): void
+    public function setGenres(?array $genres): void
     {
-        $this->mechanics = $mechanics;
+        $this->genres = $genres;
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getCategories(): array
+    public function getThemes(): ?array
     {
-        return $this->categories;
+        return $this->themes;
     }
 
     /**
-     * @param array $categories
+     * @param array|null $themes
      */
-    public function setCategories(array $categories): void
+    public function setThemes(?array $themes): void
     {
-        $this->categories = $categories;
+        $this->themes = $themes;
     }
+
+    /**
+     * @return array|null
+     */
+    public function getKeywords(): ?array
+    {
+        return $this->keywords;
+    }
+
+    /**
+     * @param array|null $keywords
+     */
+    public function setKeywords(?array $keywords): void
+    {
+        $this->keywords = $keywords;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getMultiplayerModes(): ?array
+    {
+        return $this->multiplayer_modes;
+    }
+
+    /**
+     * @param array|null $multiplayer_modes
+     */
+    public function setMultiplayerModes(?array $multiplayer_modes): void
+    {
+        $this->multiplayer_modes = $multiplayer_modes;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getPlatforms(): ?array
+    {
+        return $this->platforms;
+    }
+
+    /**
+     * @param array|null $platforms
+     */
+    public function setPlatforms(?array $platforms): void
+    {
+        $this->platforms = $platforms;
+    }
+
+
 }

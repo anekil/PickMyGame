@@ -16,20 +16,19 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class GameController extends AbstractController
+class GameSearchController extends AbstractController
 {
     /**
      * @param RequestStack $requestStack
      * @param HttpClientInterface $client
      * @param SerializerInterface $serializer
-     * @param MechanicRepository $mechanicRepository
-     * @param CategoryRepository $categoryRepository
      */
     public function __construct(private readonly RequestStack        $requestStack,
                                 private readonly HttpClientInterface $client,
                                 private readonly SerializerInterface $serializer,
-                                private readonly MechanicRepository  $mechanicRepository,
-                                private readonly CategoryRepository  $categoryRepository)
+                                //private readonly MechanicRepository  $mechanicRepository,
+                                //private readonly CategoryRepository  $categoryRepository)
+                                )
     {}
 
     /**
@@ -39,10 +38,11 @@ class GameController extends AbstractController
     {
         $request = $this->requestStack->getMainRequest();
         if ($request) {
-            $data = json_decode($request->getContent(), true);
+            //$params = json_decode($request->getContent(), true);
+            $params = 'fields name, total_rating, genres.name, keywords.name, multiplayer_modes.*, platforms.name, summary, themes.name, url; limit 1;' . 'where genres.name = ("Adventure");';
 
             try {
-                $response = $this->getDataFromAPI($this->getURL($data));
+                $response = $this->getDataFromAPI($this->getParameter('search_game_url'), $params);
                 $response = $this->processResponse($response);
                 return new JsonResponse($this->serializer->serialize($response, 'json'), 200, [], true);
             } catch (ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
@@ -52,35 +52,31 @@ class GameController extends AbstractController
         throw new Exception('No parameters');
     }
 
-    private function getURL($toAPI) : string
-    {
-        $url = $this->getParameter('search_game_url');
-        foreach($toAPI as $key => $value){
-            if($value !== null)
-                $url .= '&'.$key.'='.$value;
-        }
-        return $url;
-    }
-
     /**
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
      */
-    private function getDataFromAPI(string $url): GameData
+    private function getDataFromAPI(string $url, string $params): GameData | array
     {
-        $response = $this->client->request('GET', $url);
+        $response = $this->client->request('POST', $url, [
+            'headers' => [
+                'Authorization: Bearer owwipoumkigqgzhrkjd4evg8v720cp',
+                'Client-ID: t6vglpbbejgf6vm4ptt5q5lsrlros2'
+            ],
+            'body' => $params,
+        ]);
         $data = json_decode($response->getContent(), true);
-        $data = $data['games'][0];
+        $data = $data[0];
         $data = json_encode($data, true);
         return $this->serializer->deserialize($data, GameData::class, 'json');
     }
 
     private function processResponse(GameData $data): GameData
     {
-        $data->setMechanics($this->changeIdToName($data->getMechanics(), $this->mechanicRepository));
-        $data->setCategories($this->changeIdToName($data->getCategories(), $this->categoryRepository));
+        //$data->setMechanics($this->changeIdToName($data->getMechanics(), $this->mechanicRepository));
+        //$data->setCategories($this->changeIdToName($data->getCategories(), $this->categoryRepository));
         return $data;
     }
 
