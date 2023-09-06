@@ -1,11 +1,12 @@
 import SearchForm from "../../components/searchForm.jsx";
 
 const initialValues = {
-    title: '',
+    genres: ""
+    /*title: '',
     players: 4,
     playtime: [10, 180],
     categories: [],
-    mechanics: [],
+    mechanics: [],*/
 };
 
 export default async function Page() {

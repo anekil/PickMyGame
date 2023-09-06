@@ -1,35 +1,58 @@
-import {useRouter} from "next/navigation";
+"use client"
+import { useSearchParams } from "next/navigation";
 
 export const GameData = () => {
-    const router = useRouter();
-    const data = JSON.parse(router.query.game);
+    const searchParams = useSearchParams();
+    const data = JSON.parse(searchParams.get('game'));
 
     return (
         <div>
             <h1>{data.name}</h1>
-            <img src={data.image_url} alt={"data image"} width={120} height={120}/>
-            <p>Players: {data.min_players}-{data.max_players}</p>
-            <p>Playtime: {data.min_playtime}-{data.max_playtime}</p>
-            { data.average_user_rating != null
-                ? <p>User rating: {data.average_user_rating}</p> : <></>
+            {/*<img src={data.image_url} alt={"data image"} width={120} height={120}/>*/}
+            { data.summary != null
+                ? <p>Summary: {data.summary}</p> : <></>
             }
+            <p>Rating: {data.total_rating}</p>
             <ul>
                 <p>Categories:</p>
-                {data.categories.map(item =>
+                {data.genres.map(item =>
                     <li key={item}>{item}</li>
                 )}
             </ul>
             <ol>
-                <p>Mechanics:</p>
-                {data.mechanics.map(item =>
+                <p>Themes:</p>
+                {data.themes.map(item =>
                     <li key={item}>{item}</li>
                 )}
             </ol>
-            { data.description != null
-                ? <p>Description: {data.description}</p> : <></>
+            <ul>
+                <p>Keywords:</p>
+                {data.keywords.map(item =>
+                    <li key={item}>{item}</li>
+                )}
+            </ul>
+            <ul>
+                <p>Platforms:</p>
+                {data.platforms.map(item =>
+                    <li key={item}>{item}</li>
+                )}
+            </ul>
+
+            {
+                data.multiplayer_modes != null
+                    ?   <div>
+                        <p>onlinemax: {data.multiplayer_modes.onlinemax}</p>
+                        <p>offlinemax: {data.multiplayer_modes.offlinemax}</p>
+                        <p>campaigncoop: {data.multiplayer_modes.campaigncoop}</p>
+                        <p>lancoop: {data.multiplayer_modes.lancoop}</p>
+                        <p>offlinecoop: {data.multiplayer_modes.offlinecoop}</p>
+                        <p>onlinecoop: {data.multiplayer_modes.onlinecoop}</p>
+                        </div>
+                    : <></>
             }
-            { data.rules_url != null
-                ? <a href={data.rules_url}>Link to rules</a> : <></>
+
+            { data.url != null
+                ? <a href={data.url}>Link to {data.name}'s page</a> : <></>
             }
         </div>
     );

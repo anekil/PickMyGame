@@ -75,17 +75,19 @@ class GameSearchController extends AbstractController
 
     private function processResponse(GameData $data): GameData
     {
-        //$data->setMechanics($this->changeIdToName($data->getMechanics(), $this->mechanicRepository));
+        $data->setGenres($this->removeId($data->getGenres()));
+        $data->setThemes($this->removeId($data->getThemes()));
+        $data->setKeywords($this->removeId($data->getKeywords()));
+        $data->setPlatforms($this->removeId($data->getPlatforms()));
         //$data->setCategories($this->changeIdToName($data->getCategories(), $this->categoryRepository));
         return $data;
     }
 
-    private function changeIdToName($ids, $repository): array
+    private function removeId($items): array
     {
         $names = [];
-        foreach ($ids as $id){
-            $temp = $repository->find($id["id"]);
-            $names[] = $temp->getName();
+        foreach ($items as $item){
+            $names[] = $item['name'];
         }
         return $names;
     }
