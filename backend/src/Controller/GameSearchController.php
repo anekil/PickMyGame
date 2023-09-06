@@ -39,7 +39,7 @@ class GameSearchController extends AbstractController
         $request = $this->requestStack->getMainRequest();
         if ($request) {
             //$params = json_decode($request->getContent(), true);
-            $params = 'fields name, total_rating, genres.name, keywords.name, multiplayer_modes.*, platforms.name, summary, themes.name, url; limit 1;' . 'where genres.name = ("Adventure");';
+            $params = 'fields name, total_rating, genres.name, keywords.name, multiplayer_modes.*, platforms.name, summary, themes.name, url, cover.url, screenshots.url; limit 1;'; //. 'where genres.name = ("Adventure");';
 
             try {
                 $response = $this->getDataFromAPI($this->getParameter('search_game_url'), $params);
@@ -75,19 +75,20 @@ class GameSearchController extends AbstractController
 
     private function processResponse(GameData $data): GameData
     {
-        $data->setGenres($this->removeId($data->getGenres()));
-        $data->setThemes($this->removeId($data->getThemes()));
-        $data->setKeywords($this->removeId($data->getKeywords()));
-        $data->setPlatforms($this->removeId($data->getPlatforms()));
+        $data->setGenres($this->setToNames($data->getGenres(), "name"));
+        $data->setThemes($this->setToNames($data->getThemes(), "name"));
+        $data->setKeywords($this->setToNames($data->getKeywords(), "name"));
+        $data->setPlatforms($this->setToNames($data->getPlatforms(), "name"));
+        $data->setScreenshots($this->setToNames($data->getScreenshots(), "url"));
         //$data->setCategories($this->changeIdToName($data->getCategories(), $this->categoryRepository));
         return $data;
     }
 
-    private function removeId($items): array
+    private function setToNames($items, $field): array
     {
         $names = [];
         foreach ($items as $item){
-            $names[] = $item['name'];
+            $names[] = $item[$field];
         }
         return $names;
     }

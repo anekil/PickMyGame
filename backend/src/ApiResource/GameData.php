@@ -5,6 +5,7 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use App\Controller\GameSearchController;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ApiResource(
     operations: [
@@ -28,6 +29,9 @@ class GameData
     private ?array  $keywords;
     private ?array  $multiplayer_modes;
     private ?array  $platforms;
+    #[SerializedName('cover.url')]
+    private ?string $coverUrl;
+    private ?array  $screenshots;
 
     /**
      * @return int
@@ -189,5 +193,39 @@ class GameData
         $this->platforms = $platforms;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getCoverUrl(): ?string
+    {
+        return $this->coverUrl ? ltrim($this->coverUrl, '/') : $this->coverUrl;
+    }
 
+    /**
+     * @param string|null $coverUrl
+     */
+    public function setCoverUrl(?string $coverUrl): void
+    {
+        $this->coverUrl = $coverUrl;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getScreenshots(): ?array
+    {
+        foreach ($this->screenshots as &$item){
+            if(is_array($item) && isset($item["url"]))
+                $item["url"] = ltrim($item["url"], '/');
+        }
+        return $this->screenshots;
+    }
+
+    /**
+     * @param array|null $screenshots
+     */
+    public function setScreenshots(?array $screenshots): void
+    {
+        $this->screenshots = $screenshots;
+    }
 }

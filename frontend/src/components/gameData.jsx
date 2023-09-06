@@ -8,7 +8,9 @@ export const GameData = () => {
     return (
         <div>
             <h1>{data.name}</h1>
-            {/*<img src={data.image_url} alt={"data image"} width={120} height={120}/>*/}
+            { /*data.cover.url != null
+                ? <img src={data.image_url} alt={"data image"} width={120} height={120}/> : <></>*/
+            }
             { data.summary != null
                 ? <p>Summary: {data.summary}</p> : <></>
             }
@@ -38,8 +40,7 @@ export const GameData = () => {
                 )}
             </ul>
 
-            {
-                data.multiplayer_modes != null
+            { data.multiplayer_modes != null
                     ?   <div>
                         <p>onlinemax: {data.multiplayer_modes.onlinemax}</p>
                         <p>offlinemax: {data.multiplayer_modes.offlinemax}</p>
@@ -47,9 +48,14 @@ export const GameData = () => {
                         <p>lancoop: {data.multiplayer_modes.lancoop}</p>
                         <p>offlinecoop: {data.multiplayer_modes.offlinecoop}</p>
                         <p>onlinecoop: {data.multiplayer_modes.onlinecoop}</p>
-                        </div>
+                    </div>
                     : <></>
             }
+
+            <p>Screenshots:</p>
+            {data.screenshots.map((item, index) => (
+                <img key={index} src={item.url} alt={`screenshot-${index}`} width={120} height={120} />
+            ))}
 
             { data.url != null
                 ? <a href={data.url}>Link to {data.name}'s page</a> : <></>

@@ -14,7 +14,6 @@ const SearchForm = ({ initialValues }) => {
     const handleSubmit = async (values) => {
         const url = "http://localhost:8000/api/search";
         alert(JSON.stringify(values))
-
         const options = {
             method: 'POST',
             headers: {
@@ -23,12 +22,10 @@ const SearchForm = ({ initialValues }) => {
             },
             body: JSON.stringify(values),
         };
-
         const response = await fetch(url, options);
         const game = await response.json();
         const data = JSON.stringify(game);
-
-        alert(JSON.stringify(game))
+        alert(data)
         router.push( `/about?game=${data}`);
     };
 
@@ -91,7 +88,6 @@ const SearchForm = ({ initialValues }) => {
                 {/*        <OptionsList />*/}
                 {/*    </OptionContext.Provider>*/}
                 {/*</div>*/}
-
                 <Button variant="contained" type="submit">Search</Button>
             </Form>
         </Formik>
