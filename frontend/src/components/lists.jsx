@@ -15,8 +15,7 @@ const listItems = async (handle) => {
 
 export const OptionsList = () =>  {
     const option = useContext(OptionContext);
-    let handle = option;
-    const {data: items, isLoading, error} = swr(handle, listItems);
+    const {data: items, isLoading, error} = swr(option, listItems);
 
     if (error) return (
         <p>
@@ -32,7 +31,7 @@ export const OptionsList = () =>  {
 
     return items.map(item =>
         <label>
-            <Field type="checkbox" name={option} value={item.api_id}/>
+            <Field type="checkbox" name={option} value={`${item.api_id}`} />
             {item.name}
         </label>
     );

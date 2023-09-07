@@ -8,8 +8,8 @@ export const GameData = () => {
     return (
         <div>
             <h1>{data.name}</h1>
-            { data.cover.url != null
-                ? <img src={data.image_url} alt={"data image"} width={120} height={120}/> : <></>
+            { /*data.cover.url != null
+                ? <img src={data.image_url} alt={"data image"} width={120} height={120}/> : <></>*/
             }
             { data.summary != null
                 ? <p>Summary: {data.summary}</p> : <></>
