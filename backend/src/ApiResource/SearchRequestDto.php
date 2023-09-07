@@ -7,5 +7,8 @@ use ApiPlatform\Metadata\ApiResource;
 #[ApiResource(operations: [])]
 class SearchRequestDto
 {
-    public ?string $genres = null;
+    public ?string $title = null;
+    public ?array $genres = null;
+    public ?array $platforms = null;
+    public ?array $themes = null;
 }

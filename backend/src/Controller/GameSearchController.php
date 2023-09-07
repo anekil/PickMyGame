@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\ApiResource\GameData;
-use App\Repository\CategoryRepository;
-use App\Repository\MechanicRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,23 +31,41 @@ class GameSearchController extends AbstractController
 
     /**
      * @throws Exception
+     * @throws TransportExceptionInterface
      */
     public function __invoke(): JsonResponse
     {
         $request = $this->requestStack->getMainRequest();
         if ($request) {
-            //$params = json_decode($request->getContent(), true);
-            $params = 'fields name, total_rating, genres.name, keywords.name, multiplayer_modes.*, platforms.name, summary, themes.name, url, cover.url, screenshots.url; limit 1;'; //. 'where genres.name = ("Adventure");';
-
             try {
-                $response = $this->getDataFromAPI($this->getParameter('search_game_url'), $params);
+                $params = json_decode($request->getContent(), true);
+                $response = $this->getDataFromAPI($this->getParameter('search_game_url'), $this->getFilters($params));
                 $response = $this->processResponse($response);
                 return new JsonResponse($this->serializer->serialize($response, 'json'), 200, [], true);
-            } catch (ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $e) {
+            } catch (ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface) {
                 throw new Exception('Problem with connection');
             }
         }
         throw new Exception('No parameters');
+    }
+
+    private function getFilters($params): string
+    {
+        $filters = [];
+        if($params["title"] != null)
+            $filters[] = " game.title ~ *{$params["title"]}* ";
+        if($params["genres"] != null){
+            $filters[] = " genres = [" . implode(",", $params["genres"]) . "]";
+        }
+        if($params["platforms"] != null){
+            $filters[] = " platforms = [" . implode(",", $params["platforms"]) . "]";
+        }
+        if($params["themes"] != null){
+            $filters[] = " themes = [" . implode(",", $params["themes"]) . "]";
+        }
+        $filters = "where " . implode("&", $filters) . ";";
+        $fields = 'fields name, total_rating, genres.name, keywords.name, multiplayer_modes.*, platforms.name, summary, themes.name, url, cover.url, screenshots.url; limit 1; ';
+        return $fields.$filters;
     }
 
     /**
@@ -80,12 +96,13 @@ class GameSearchController extends AbstractController
         $data->setKeywords($this->setToNames($data->getKeywords(), "name"));
         $data->setPlatforms($this->setToNames($data->getPlatforms(), "name"));
         $data->setScreenshots($this->setToNames($data->getScreenshots(), "url"));
-        //$data->setCategories($this->changeIdToName($data->getCategories(), $this->categoryRepository));
         return $data;
     }
 
-    private function setToNames($items, $field): array
+    private function setToNames($items, $field): ?array
     {
+        if($items == null)
+            return $items;
         $names = [];
         foreach ($items as $item){
             $names[] = $item[$field];

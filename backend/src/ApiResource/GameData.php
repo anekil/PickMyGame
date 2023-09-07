@@ -20,18 +20,18 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 class GameData
 {
     private int     $id = 0;
-    private string  $name;
-    private ?string $summary;
-    private ?string $url;
-    private ?float  $total_rating;
-    private ?array  $genres;
-    private ?array  $themes;
-    private ?array  $keywords;
-    private ?array  $multiplayer_modes;
-    private ?array  $platforms;
+    private string  $name = "";
+    private ?string $summary = null;
+    private ?string $url = null;
+    private ?float  $total_rating = null;
+    private ?array  $genres = null;
+    private ?array  $themes = null;
+    private ?array  $keywords = null;
+    private ?array  $multiplayer_modes = null;
+    private ?array  $platforms = null;
     #[SerializedName('cover.url')]
-    private ?string $coverUrl;
-    private ?array  $screenshots;
+    private ?string $coverUrl = null;
+    private ?array  $screenshots = null;
 
     /**
      * @return int
@@ -214,6 +214,8 @@ class GameData
      */
     public function getScreenshots(): ?array
     {
+        if($this->screenshots == null)
+            return $this->screenshots;
         foreach ($this->screenshots as &$item){
             if(is_array($item) && isset($item["url"]))
                 $item["url"] = ltrim($item["url"], '/');
