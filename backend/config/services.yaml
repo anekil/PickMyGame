@@ -5,8 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     search_game_url: '%env(API_SEARCH_GAME_URL)%'
-    get_categories_url : '%env(API_GET_CATEGORIES_URL)%'
-    get_mechanics_url : '%env(API_GET_MECHANICS_URL)%'
+    get_genres_url : '%env(API_GET_GENRES_URL)%'
+    get_themes_url : '%env(API_GET_THEMES_URL)%'
+    get_platforms_url : '%env(API_GET_PLATFORMS_URL)%'
 
 services:
     # default configuration for services in *this* file

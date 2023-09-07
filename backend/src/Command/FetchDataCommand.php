@@ -2,8 +2,9 @@
 
 namespace App\Command;
 
-use App\Entity\Category;
-use App\Entity\Mechanic;
+use App\Entity\Genre;
+use App\Entity\Platform;
+use App\Entity\Theme;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -21,10 +22,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(
-    name: 'app:get-categories-and-mechanics',
-    description: 'Add a short description for your command',
+    name: 'app:fetch-data',
+    description: 'Fetch data needed to searching from API',
 )]
-class GetCategoriesAndMechanicsCommand extends Command
+class FetchDataCommand extends Command
 {
     public function __construct(private readonly EntityManagerInterface $entityManager,
                                 private ContainerBagInterface $params,
@@ -38,21 +39,24 @@ class GetCategoriesAndMechanicsCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $categories = $this->getDataFromAPI($this->params->get('get_categories_url'));
-            $mechanics = $this->getDataFromAPI($this->params->get('get_mechanics_url'));
+            $genres = $this->getDataFromAPI($this->params->get('get_genres_url'));
+            $themes = $this->getDataFromAPI($this->params->get('get_themes_url'));
+            $platforms = $this->getDataFromAPI($this->params->get('get_platforms_url'));
 
-            if(!$categories["status"] || !$mechanics["status"] ){
+            if(!$genres["status"] || !$themes["status"] || !$platforms["status"]){
                 $io->success('Error occurred when downloading data.');
                 return Command::FAILURE;
             }
 
-            $this->saveItems($categories["data"]["categories"], Category::class);
-            $this->saveItems($mechanics["data"]["mechanics"],  Mechanic::class);
+            $this->saveItems($genres["data"], Genre::class);
+            $this->saveItems($themes["data"],  Theme::class);
+            $this->saveItems($platforms["data"], Platform::class);
 
-            $io->success('Successfully downloaded and saved categories and mechanics.');
+            $io->success('Successfully downloaded and saved data.');
             return Command::SUCCESS;
 
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface) {
+            echo "Some error occurred while fetching data.\n";
             return Command::FAILURE;
         }
     }
@@ -60,7 +64,13 @@ class GetCategoriesAndMechanicsCommand extends Command
     private function getDataFromAPI(string $url): array
     {
         try {
-            $response = $this->client->request('GET', $url);
+            $response = $this->client->request('POST', $url, [
+                'headers' => [
+                    'Authorization: Bearer owwipoumkigqgzhrkjd4evg8v720cp',
+                    'Client-ID: t6vglpbbejgf6vm4ptt5q5lsrlros2'
+                ],
+                'body' => "fields name; limit 500;",
+            ]);
             $statusCode = $response->getStatusCode();
             if($statusCode === 200)
                 return ["status" => true, "data" => $response->toArray()];
@@ -76,7 +86,7 @@ class GetCategoriesAndMechanicsCommand extends Command
         foreach ($items as $item) {
             $newItem = new $class;
             $newItem->setName($item['name'])
-                    ->setApiId($item['id']);
+                ->setApiId($item['id']);
             $this->entityManager->persist($newItem);
         }
         $this->entityManager->flush();
