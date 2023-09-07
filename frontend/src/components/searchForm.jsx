@@ -1,15 +1,20 @@
 "use client";
 import React, { createContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import Slider from '@mui/material/Slider';
 import {OptionsList} from "./lists";
 import { useRouter } from 'next/navigation'
 import {Button} from "@mui/material";
-import Link from "next/link";
+
+const initialValues = {
+    title: "",
+    genres: [],
+    platforms: [],
+    themes: []
+};
 
 export const OptionContext = createContext("");
 
-const SearchForm = ({ initialValues }) => {
+const SearchForm = () => {
     const router = useRouter();
     const handleSubmit = async (values) => {
         const url = "http://localhost:8000/api/search";
@@ -38,56 +43,26 @@ const SearchForm = ({ initialValues }) => {
                     <ErrorMessage name="title" component="div" />
                 </div>
 
-                {/*<div>*/}
-                {/*    <label htmlFor="players">Players</label>*/}
-                {/*    <Field name="players">*/}
-                {/*        {({ field }) => (*/}
-                {/*            <Slider*/}
-                {/*                {...field}*/}
-                {/*                value={field.value}*/}
-                {/*                onChange={(event, newValue) => {*/}
-                {/*                    field.onChange({ target: { name: field.name, value: newValue } });*/}
-                {/*                }}*/}
-                {/*                min={1}*/}
-                {/*                max={14}*/}
-                {/*                marks={true}*/}
-                {/*                valueLabelDisplay="auto"*/}
-                {/*            />*/}
-                {/*        )}*/}
-                {/*    </Field>*/}
-                {/*</div>*/}
+                <div>
+                    <OptionContext.Provider value="genres">
+                        <label>Genres</label>
+                        <OptionsList />
+                    </OptionContext.Provider>
+                </div>
 
-                {/*<div>*/}
-                {/*    <label htmlFor="playtime">Playtime</label>*/}
-                {/*    <Field name="playtime">*/}
-                {/*        {({ field }) => (*/}
-                {/*            <Slider*/}
-                {/*                {...field}*/}
-                {/*                value={field.value}*/}
-                {/*                onChange={(event, newValue) => {*/}
-                {/*                    field.onChange({ target: { name: field.name, value: newValue } });*/}
-                {/*                }}*/}
-                {/*                min={10}*/}
-                {/*                max={180}*/}
-                {/*                valueLabelDisplay="auto"*/}
-                {/*            />*/}
-                {/*        )}*/}
-                {/*    </Field>*/}
-                {/*</div>*/}
+                <div>
+                    <OptionContext.Provider value="themes">
+                        <label>Themes</label>
+                        <OptionsList />
+                    </OptionContext.Provider>
+                </div>
 
-                {/*<div>*/}
-                {/*    <OptionContext.Provider value="categories">*/}
-                {/*        <label>Categories</label>*/}
-                {/*        <OptionsList />*/}
-                {/*    </OptionContext.Provider>*/}
-                {/*</div>*/}
-
-                {/*<div>*/}
-                {/*    <OptionContext.Provider value="mechanics">*/}
-                {/*        <label>Mechanics</label>*/}
-                {/*        <OptionsList />*/}
-                {/*    </OptionContext.Provider>*/}
-                {/*</div>*/}
+                <div>
+                    <OptionContext.Provider value="platforms">
+                        <label>Platforms</label>
+                        <OptionsList />
+                    </OptionContext.Provider>
+                </div>
                 <Button variant="contained" type="submit">Search</Button>
             </Form>
         </Formik>
