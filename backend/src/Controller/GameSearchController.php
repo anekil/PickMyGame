@@ -24,8 +24,6 @@ class GameSearchController extends AbstractController
     public function __construct(private readonly RequestStack        $requestStack,
                                 private readonly HttpClientInterface $client,
                                 private readonly SerializerInterface $serializer,
-                                //private readonly MechanicRepository  $mechanicRepository,
-                                //private readonly CategoryRepository  $categoryRepository)
                                 )
     {}
 
@@ -53,7 +51,7 @@ class GameSearchController extends AbstractController
     {
         $filters = [];
         if($params["title"] != null)
-            $filters[] = " game.title ~ *{$params["title"]}* ";
+            $filters[] = ' name ~ *"' . $params["title"] . '"* ';
         if($params["genres"] != null){
             $filters[] = " genres = [" . implode(",", $params["genres"]) . "]";
         }
