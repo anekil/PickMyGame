@@ -89,22 +89,33 @@ class GameSearchController extends AbstractController
 
     private function processResponse(GameData $data): GameData
     {
-        $data->setGenres($this->setToNames($data->getGenres(), "name"));
-        $data->setThemes($this->setToNames($data->getThemes(), "name"));
-        $data->setKeywords($this->setToNames($data->getKeywords(), "name"));
-        $data->setPlatforms($this->setToNames($data->getPlatforms(), "name"));
-        $data->setScreenshots($this->setToNames($data->getScreenshots(), "url"));
+        $data->setGenres($this->setToNames($data->getGenres()));
+        $data->setThemes($this->setToNames($data->getThemes()));
+        $data->setKeywords($this->setToNames($data->getKeywords()));
+        $data->setPlatforms($this->setToNames($data->getPlatforms()));
+        $data->setScreenshots($this->setToUrl($data->getScreenshots()));
         return $data;
     }
 
-    private function setToNames($items, $field): ?array
+    private function setToNames($items): ?array
     {
         if($items == null)
             return $items;
         $names = [];
         foreach ($items as $item){
-            $names[] = $item[$field];
+            $names[] = $item["name"];
         }
         return $names;
+    }
+
+    private function setToUrl($items): ?array
+    {
+        if($items == null)
+            return $items;
+        $urls = [];
+        foreach ($items as $item){
+            $urls[] = "https://".$item["url"];
+        }
+        return $urls;
     }
 }

@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss'
 import {nextui} from "@nextui-org/react";
 
-
 const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -12,11 +11,16 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
+        'pattern': 'url("/images/dark_geometric.png")',
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
+    colors: {
+      indigo: '#5c6ac4',
+      blue: '#007ace',
+      red: '#de3618',
+    }
   },
   darkMode: "class",
   plugins: [nextui()],
