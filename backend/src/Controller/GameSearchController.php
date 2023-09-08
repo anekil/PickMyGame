@@ -53,7 +53,7 @@ class GameSearchController extends AbstractController
     {
         $filters = [];
         if($params["title"] != null)
-            $filters[] = " game.title ~ *{$params["title"]}* ";
+            $filters[] = ' name ~ *"' . $params["title"] . '"* ';
         if($params["genres"] != null){
             $filters[] = " genres = [" . implode(",", $params["genres"]) . "]";
         }
