@@ -93,7 +93,8 @@ class GameSearchController extends AbstractController
         $data->setThemes($this->setToNames($data->getThemes()));
         $data->setKeywords($this->setToNames($data->getKeywords()));
         $data->setPlatforms($this->setToNames($data->getPlatforms()));
-        $data->setScreenshots($this->setToUrl($data->getScreenshots()));
+        $data->setScreenshots($this->setScreenshotsToUrl($data->getScreenshots()));
+        $data->setCover($this->setCoverToUrl($data->getCover()));
         return $data;
     }
 
@@ -108,7 +109,7 @@ class GameSearchController extends AbstractController
         return $names;
     }
 
-    private function setToUrl($items): ?array
+    private function setScreenshotsToUrl($items): ?array
     {
         if($items == null)
             return $items;
@@ -116,6 +117,14 @@ class GameSearchController extends AbstractController
         foreach ($items as $item){
             $urls[] = "https://".$item["url"];
         }
+        return $urls;
+    }
+
+    private function setCoverToUrl($item): ?array
+    {
+        if($item == null)
+            return $item;
+        $urls[] = "https://".$item["url"];
         return $urls;
     }
 }

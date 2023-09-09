@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import {Field} from "formik";
 import {OptionContext} from "./searchForm";
 import {Checkbox, FormControlLabel} from "@mui/material";
+import {Divider} from "@nextui-org/react";
 
 
 const fetcher = axios.create({ baseURL: 'http://127.0.0.1:8000/api/'});
@@ -32,13 +33,15 @@ export const OptionsList = () =>  {
     );
 
     return items.map(item =>
-        <label>
-            <Field type="checkbox"
-                   name={option}
-                   value={`${item.api_id}`}
-                   as={FormControlLabel}
-                   control={<Checkbox />} />
-            {item.name}
-        </label>
+        <div key={item.api_id}>
+            <label>
+                <Field type="checkbox"
+                       name={option}
+                       value={`${item.api_id}`}
+                       as={FormControlLabel}
+                       control={<Checkbox />} />
+                {item.name}
+            </label>
+        </div>
     );
 }

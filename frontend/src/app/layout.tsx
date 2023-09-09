@@ -11,7 +11,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en" className='dark'>
         <body>
-        <main className='flex justify-center items-center h-screen bg-pattern'>
+        <main className='flex justify-center items-center h-screen overflow-auto bg-pattern'>
         <Providers>
             {children}
         </Providers>

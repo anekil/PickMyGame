@@ -29,8 +29,7 @@ class GameData
     private ?array  $keywords = null;
     private ?array  $multiplayer_modes = null;
     private ?array  $platforms = null;
-    #[SerializedName('cover.url')]
-    private ?string $coverUrl = null;
+    private ?array  $cover = null;
     private ?array  $screenshots = null;
 
     /**
@@ -102,7 +101,7 @@ class GameData
      */
     public function getTotalRating(): ?float
     {
-        return $this->total_rating;
+        return round($this->total_rating);
     }
 
     /**
@@ -194,19 +193,23 @@ class GameData
     }
 
     /**
-     * @return string|null
+     * @return array|null
      */
-    public function getCoverUrl(): ?string
+    public function getCover(): ?array
     {
-        return $this->coverUrl ? ltrim($this->coverUrl, '/') : $this->coverUrl;
+        if($this->cover == null)
+            return $this->cover;
+        if(is_array($this->cover) && isset($this->cover["url"]))
+            $this->cover["url"] = ltrim($this->cover["url"], '/');
+        return $this->cover;
     }
 
     /**
-     * @param string|null $coverUrl
+     * @param array|null $cover
      */
-    public function setCoverUrl(?string $coverUrl): void
+    public function setCover(?array $cover): void
     {
-        $this->coverUrl = $coverUrl;
+        $this->cover = $cover;
     }
 
     /**
