@@ -24,7 +24,7 @@ class Genre
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     private ?int $apiId = null;
 
     public function getId(): ?int

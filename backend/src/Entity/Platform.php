@@ -5,13 +5,15 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\PlatformRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: PlatformRepository::class)]
-#[ApiResource(operations: [new GetCollection()])]
+#[ApiResource(operations: [new GetCollection(), new Post(), new Delete()])]
 #[ApiFilter(SearchFilter::class, properties: ['$apiId' => 'exact'])]
 #[UniqueEntity('apiId')]
 class Platform
@@ -24,7 +26,7 @@ class Platform
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     private ?int $apiId = null;
 
     public function getId(): ?int

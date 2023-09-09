@@ -6,6 +6,7 @@ use App\Entity\Genre;
 use App\Entity\Platform;
 use App\Entity\Theme;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -28,8 +29,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class FetchDataCommand extends Command
 {
     public function __construct(private readonly EntityManagerInterface $entityManager,
-                                private ContainerBagInterface $params,
-                                private readonly HttpClientInterface $client)
+                                private readonly ContainerBagInterface  $params,
+                                private readonly HttpClientInterface    $client)
     {
         parent::__construct();
     }
@@ -39,9 +40,9 @@ class FetchDataCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $genres = $this->getDataFromAPI($this->params->get('get_genres_url'));
-            $themes = $this->getDataFromAPI($this->params->get('get_themes_url'));
-            $platforms = $this->getDataFromAPI($this->params->get('get_platforms_url'));
+            $genres = $this->getDataFromAPI($this->params->get('get_genres_url'), "");
+            $themes = $this->getDataFromAPI($this->params->get('get_themes_url'), "");
+            $platforms = $this->getDataFromAPI($this->params->get('get_platforms_url'), "where id = (39, 34, 6, 3, 14, 163, 162, 11, 7, 41);");
 
             if(!$genres["status"] || !$themes["status"] || !$platforms["status"]){
                 $io->success('Error occurred when downloading data.');
@@ -61,7 +62,7 @@ class FetchDataCommand extends Command
         }
     }
 
-    private function getDataFromAPI(string $url): array
+    private function getDataFromAPI(string $url, string $filters): array
     {
         try {
             $response = $this->client->request('POST', $url, [
@@ -69,7 +70,7 @@ class FetchDataCommand extends Command
                     'Authorization: Bearer owwipoumkigqgzhrkjd4evg8v720cp',
                     'Client-ID: t6vglpbbejgf6vm4ptt5q5lsrlros2'
                 ],
-                'body' => "fields name; limit 500;",
+                'body' => "fields name; limit 500; ".$filters,
             ]);
             $statusCode = $response->getStatusCode();
             if($statusCode === 200)
