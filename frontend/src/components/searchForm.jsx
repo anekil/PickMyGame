@@ -30,7 +30,6 @@ const SearchForm = () => {
         const response = await fetch(url, options);
         const game = await response.json();
         const data = JSON.stringify(game);
-        alert(data)
         router.push( `/about?game=${data}`);
     };
 
@@ -43,10 +42,6 @@ const SearchForm = () => {
                     </CardHeader>
 
                     <CardBody>
-                        <div>
-                            <h2>Game Title</h2>
-                            <Field type="text" id="title" name="title" />
-                        </div>
                         <Grid container
                               direction="row"
                               justifyContent="space-evenly"
@@ -77,6 +72,10 @@ const SearchForm = () => {
                                 </div>
                             </Grid>
                         </Grid>
+                        <div className="min-w-full">
+                            <h2>Game Title</h2>
+                            <Field type="text" id="title" name="title" />
+                        </div>
                     </CardBody>
                     <CardFooter className="flex items-center justify-center h-full">
                         <Button variant="solid" color="primary" type="submit" className="mx-auto">Search</Button>

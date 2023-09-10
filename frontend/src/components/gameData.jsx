@@ -8,12 +8,8 @@ export const GameData = () => {
     const data = JSON.parse(searchParams.get('game'));
 
     const name = (<h1>{data.name}</h1>);
-    const rating = ( <>
-        { data.total_rating != null ?  <>
-            <p>Rating: </p>
-            <h2>{data.total_rating}</h2> </>: <></>
-        } </>);
-    const summary = (<>{data.summary != null ? <p>{data.summary}</p>  : <></> }</>);
+    const rating = (<>{ data.total_rating != null ? <h2>Rating: {data.total_rating}</h2> : <></> } </>);
+    const summary = (<>{data.summary != null ? <p>{data.summary}</p> : <></> } </>);
     const url = ( <>
         { data.url != null
             ? <a href={data.url}>Link to {data.name}'s page</a> : <></>
@@ -42,11 +38,11 @@ export const GameData = () => {
         } </>);
     const cover = (<>
         { data.cover != null ?
-            <Card><img src={data.cover} alt={"data image"} width={120} height={120}/></Card> : <></>
+            <Card><img src={data.cover} alt={"data image"} className="w=1/3"/></Card> : <></>
         }</>);
     const screenshots = (<>
         { data.screenshots != null ?
-            <Card>
+            <Card className="w-3/4 m-20">
                 <CardHeader><h3>Screenshots</h3></CardHeader>
                 <CardBody>
                     <ImageList cols={12} gap={8}>
@@ -65,12 +61,18 @@ export const GameData = () => {
     </>);
 
     const description = (
-        <Card >
+        <Card>
             <CardBody>
-                {name}
-                {summary}
+                <Grid container
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="stretch"
+                      spacing={3}>
+                    <Grid item>{name}</Grid>
+                    <Grid item>{rating}</Grid>
+                </Grid>
                 {url}
-                {rating}
+                {summary}
                 <Grid container
                       direction="row"
                       justifyContent="space-between"
@@ -82,15 +84,15 @@ export const GameData = () => {
                     <Grid item>{platforms}</Grid>
                 </Grid>
             </CardBody>
-        </Card> );
+        </Card>);
 
     return (
         <>
             <Grid container
                   direction="row"
-                  justifyContent="space-evenly"
-                  alignItems="baseline">
-                <Grid item>{description}</Grid>
+                  justifyContent="space-around"
+                  alignItems="center">
+                <Grid item className="w-1/2">{description}</Grid>
                 <Grid item>{cover}</Grid>
             </Grid>
             {screenshots}
