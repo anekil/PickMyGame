@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { HeaderAuth, HeaderUnauth } from "@/components/header";
-import { SearchPageButton } from "@/components/buttons";
+import { HomeAuth, HomeUnauth } from "@/components/home";
 
 export default async function Home() {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,12 @@ export default async function Home() {
                 </>) : (
                     <HeaderUnauth />
                 )}
-                <SearchPageButton />
+
+                { authorized ? (<>
+                    <HomeAuth />
+                </>) : (
+                    <HomeUnauth />
+                )}
             </div>
         </main>
     );
