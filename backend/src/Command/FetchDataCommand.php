@@ -67,8 +67,8 @@ class FetchDataCommand extends Command
         try {
             $response = $this->client->request('POST', $url, [
                 'headers' => [
-                    'Authorization: Bearer owwipoumkigqgzhrkjd4evg8v720cp',
-                    'Client-ID: t6vglpbbejgf6vm4ptt5q5lsrlros2'
+                    'Authorization: Bearer ' + "API_BEARER_HERE",
+                    'Client-ID: ' + "API_CLIENT_ID_HERE"
                 ],
                 'body' => "fields name; limit 500; ".$filters,
             ]);
